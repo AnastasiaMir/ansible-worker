@@ -28,29 +28,11 @@
     become_method: sudo
 
   - name: set private ssh
-    ansible.posix.authorized_key:
-      user: ansible-worker
-      state: present
-      key: "{{ lookup('file', 'ssh_keys/id_rsa') }}"
-      path: /home/ansible-worker/.ssh/id_rsa
-      manage_dir: false
+    ansible.builtin.template:
+      src: ssh_keys/id_rsa
+      dest: /home/ansible-worker/.ssh/id_rsa
+      mode: 0600
     become: yes
-    become_method: sudo
-
-  # - name: ssh copy
-  #   ansible.builtin.copy:
-  #     src: ssh_keys/id_rsa
-  #     dest: ~/.ssh/id_rsa
-  #     mode: 0600
-  #   become: yes
-  
-  # - name: public ssh copy
-  #   ansible.builtin.copy:
-  #     src: /ssh_keys/id_rsa.pub
-  #     dest: ~/.ssh/id_rsa.pub
-  #     mode: 0644
-  #   become: yes
-
   
   - name: Git clone iphilka repo
     ansible.builtin.git:
