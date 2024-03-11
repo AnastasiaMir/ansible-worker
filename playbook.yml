@@ -41,6 +41,22 @@
       clone: yes
       update: no
     become: yes
+
+  - name: Replace index.html
+      ansible.builtin.copy:
+        src: index.html
+        dest: /home/ansible-worker/www/stud-template/index.html
+        owner: ansible-worker
+        group: ansible-worker
+        mode: 0644
+  
+  - name: Set read permissions
+      ansible.builtin.file:
+        path: /home/ansible-worker
+        owner: ansible-worker
+        group: ansible-worker
+        mode: 0755
+        recurse: yes
   
   - name: nginx install
     ansible.builtin.apt:
@@ -58,7 +74,10 @@
     ansible.builtin.template:
       src: ansible.iphilka.ru.conf
       dest: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+      notify: Restart Nginx
     become: yes
+  
+  
 
   - name: enable nginx site
     ansible.builtin.file:
@@ -66,3 +85,9 @@
       dest: /etc/nginx/sites-enabled/ansible.iphilka.ru.conf
       state: link
     become: yes
+  
+  handlers:
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
